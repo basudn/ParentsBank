@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParentsBank", "ParentsBank\ParentsBank.csproj", "{6906A39C-3B09-400E-8931-9DB024E618B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParentsBank.Tests", "ParentsBank.Tests\ParentsBank.Tests.csproj", "{4B6BD280-9076-46F4-8936-0BE584BC8F39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6906A39C-3B09-400E-8931-9DB024E618B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6906A39C-3B09-400E-8931-9DB024E618B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6906A39C-3B09-400E-8931-9DB024E618B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6906A39C-3B09-400E-8931-9DB024E618B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B6BD280-9076-46F4-8936-0BE584BC8F39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B6BD280-9076-46F4-8936-0BE584BC8F39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B6BD280-9076-46F4-8936-0BE584BC8F39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B6BD280-9076-46F4-8936-0BE584BC8F39}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
