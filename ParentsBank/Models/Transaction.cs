@@ -13,13 +13,13 @@ namespace ParentsBank.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public virtual int AccountId { get; set; }
-        public virtual string Account { get; set; }
-        [Required]
+        public virtual AccountDetails Account { get; set; }
         [DisplayFormat(ApplyFormatInEditMode = false, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime TransactionDate { get; set; }
         [CustomValidation(typeof(CustomFieldValidations), "ValidateNotZero")]
         public double Amount { get; set; }
         [Required]
+        [StringLength(200)]
         public string Note { get; set; }
     }
 }

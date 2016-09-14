@@ -196,18 +196,26 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AccountDetailsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\TransactionsController.cs" />
+    <Compile Include="Controllers\WishlistItemsController.cs" />
     <Compile Include="CustomValidations\CustomFieldValidations.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Account.cs" />
+    <Compile Include="Migrations\201609142148435_ApplicationDBContext.cs" />
+    <Compile Include="Migrations\201609142148435_ApplicationDBContext.Designer.cs">
+      <DependentUpon>201609142148435_ApplicationDBContext.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\AccountDetails.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Transaction.cs" />
-    <Compile Include="Models\Wishlist_Item.cs" />
+    <Compile Include="Models\WishlistItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -268,6 +276,21 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\AccountDetails\Create.cshtml" />
+    <Content Include="Views\AccountDetails\Delete.cshtml" />
+    <Content Include="Views\AccountDetails\Details.cshtml" />
+    <Content Include="Views\AccountDetails\Edit.cshtml" />
+    <Content Include="Views\AccountDetails\Index.cshtml" />
+    <Content Include="Views\Transactions\Create.cshtml" />
+    <Content Include="Views\Transactions\Delete.cshtml" />
+    <Content Include="Views\Transactions\Details.cshtml" />
+    <Content Include="Views\Transactions\Edit.cshtml" />
+    <Content Include="Views\Transactions\Index.cshtml" />
+    <Content Include="Views\WishlistItems\Create.cshtml" />
+    <Content Include="Views\WishlistItems\Delete.cshtml" />
+    <Content Include="Views\WishlistItems\Details.cshtml" />
+    <Content Include="Views\WishlistItems\Edit.cshtml" />
+    <Content Include="Views\WishlistItems\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -279,6 +302,11 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201609142148435_ApplicationDBContext.resx">
+      <DependentUpon>201609142148435_ApplicationDBContext.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
