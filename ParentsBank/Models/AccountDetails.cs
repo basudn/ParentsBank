@@ -10,21 +10,21 @@ namespace ParentsBank.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        [Required]
         [StringLength(50)]
-        [CustomValidation(typeof(CustomFieldValidations), "ValidateValidEmail")]
+        [DataType(DataType.EmailAddress)]
         public string Owner { get; set; }
         [Required]
         [StringLength(50)]
-        [CustomValidation(typeof(CustomFieldValidations), "ValidateValidEmail")]
+        [DataType(DataType.EmailAddress)]
         public string Recipient { get; set; }
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
-        [DisplayFormat(ApplyFormatInEditMode = false, DataFormatString = "{0:MM/dd/yyyy}")]
+        [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime OpenDate { get; set; }
-        [Range(0.0,100.0)]
+        [CustomValidation(typeof(CustomFieldValidations),"ValidateInterestRate")]
         public double InterestRate { get; set; }
+        public double Balance { get; set; }
         public virtual List<Transaction> Transactions { get; set; }
         public virtual List<WishlistItem> WishlistItems { get; set; }
 

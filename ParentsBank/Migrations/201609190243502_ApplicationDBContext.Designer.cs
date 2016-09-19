@@ -13,12 +13,12 @@ namespace ParentsBank.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201609142148435_ApplicationDBContext"; }
+            get { return "201609190243502_ApplicationDBContext"; }
         }
         
         string IMigrationMetadata.Source
         {
-            get { return null; }
+            get { return Resources.GetString("Source"); }
         }
         
         string IMigrationMetadata.Target
