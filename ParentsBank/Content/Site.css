@@ -22,3 +22,14 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.jumboUl {
+    color: white;
+}
+
+.jumbotron {
+    background-image: url('./Northern-Lights-Norway.jpg') !important;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}

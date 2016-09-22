@@ -80,6 +80,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -205,9 +206,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201609142148435_ApplicationDBContext.cs" />
-    <Compile Include="Migrations\201609142148435_ApplicationDBContext.Designer.cs">
-      <DependentUpon>201609142148435_ApplicationDBContext.cs</DependentUpon>
+    <Compile Include="Migrations\201609190243502_ApplicationDBContext.cs" />
+    <Compile Include="Migrations\201609190243502_ApplicationDBContext.Designer.cs">
+      <DependentUpon>201609190243502_ApplicationDBContext.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountDetails.cs" />
@@ -222,6 +223,7 @@
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Northern-Lights-Norway.jpg" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -304,8 +306,8 @@
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201609142148435_ApplicationDBContext.resx">
-      <DependentUpon>201609142148435_ApplicationDBContext.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201609190243502_ApplicationDBContext.resx">
+      <DependentUpon>201609190243502_ApplicationDBContext.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

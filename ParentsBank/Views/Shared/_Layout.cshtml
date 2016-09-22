@@ -8,7 +8,7 @@
     @Scripts.Render("~/bundles/modernizr")
 
 </head>
-<body>
+<body style="background-color:#b3ecff"> 
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -21,10 +21,18 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-warning">
+                            Home
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+                        </a>
+                    </li>
+                    <li><a href="/AccountDetails/" title="Accounts">Accounts</a></li>
+                    <li><a href="/Transactions/" title="Transactions">Transactions</a></li>
+                    <li><a href="/WishlistItems/" title="Wishlist Items">Wishlist Items</a></li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-
+                  
                     <li><a href="http://localhost:53416/Home/About"></a></li>
                     <li><a href="http://localhost:53416/Home/Contact"></a></li>
                     <li></li>
@@ -35,10 +43,7 @@
     </div>
     <div class="container body-content">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
+        <hr />   
     </div>
 
     @Scripts.Render("~/bundles/jquery")

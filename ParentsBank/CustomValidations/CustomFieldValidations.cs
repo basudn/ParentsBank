@@ -10,25 +10,39 @@ namespace ParentsBank.CustomValidations
     {
         public static ValidationResult ValidateNotZero(double value, ValidationContext context)
         {
-            if (value == 0.0)
+            if (value == 0)
             {
-                return new ValidationResult("Amount cannot be zero");
+                return new ValidationResult("Transaction amount cannot be 0.");
             }
             return ValidationResult.Success;
         }
-        public static ValidationResult ValidateValidURL(string URL, ValidationContext context)
+        public static ValidationResult ValidateInterestRate(double value, ValidationContext context)
         {
-            if(URL.StartsWith("www.")&&URL.EndsWith(".com"))
+            if (value <= 0)
             {
-                return new ValidationResult("Enter valid URL");
+                return new ValidationResult("Interest rate should be greater than 0.");
+            } else if (value >= 100)
+            {
+                return new ValidationResult("Interest rate should be less than 100.");
             }
             return ValidationResult.Success;
         }
-        public static ValidationResult ValidateValidEmail(string email, ValidationContext context)
+        public static ValidationResult ValidateItemCost(double value, ValidationContext context)
         {
-            if (email.Contains("@")&&email.EndsWith(".com")&&!email.StartsWith("@"))
+            if (value <= 0)
             {
-                return new ValidationResult("Enter valid URL");
+                return new ValidationResult("Item cost must be provided.");
+            }
+            return ValidationResult.Success;
+        }
+        public static ValidationResult ValidateTransactionDate(DateTime transactionDate, ValidationContext context)
+        {
+            if(transactionDate > DateTime.Now)
+            {
+                return new ValidationResult("Transaction date cannot be in future.");
+            } else if(transactionDate.Year < DateTime.Now.Year)
+            {
+                return new ValidationResult("Transaction date cannot be before the current year.");
             }
             return ValidationResult.Success;
         }
