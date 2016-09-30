@@ -11,6 +11,7 @@ using ParentsBank.Models;
 
 namespace ParentsBank.Controllers
 {
+    [Authorize]
     public class AccountDetailsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -19,7 +20,15 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Index()
         {
             string user = User.Identity.Name;
-            return View(await db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower()).Union(db.Accounts.Where(model => model.Recipient.ToLower() == user.ToLower())).ToListAsync());
+            List<AccountDetails> accounts = await db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower() || model.Recipient.ToLower() == user.ToLower()).ToListAsync();
+            if(accounts.Count() == 0 || accounts[0].Owner.ToLower() == user.ToLower())
+            {
+                return View(accounts);
+            }
+            else
+            {
+                return View("Details", accounts[0]);
+            }
         }
 
         // GET: AccountDetails/Details/5
@@ -29,10 +38,15 @@ namespace ParentsBank.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            string user = User.Identity.Name;
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
-            if (accountDetails == null)
+            if (accountDetails == null || (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
+            }
+            if(accountDetails.Owner.ToLower() == user.ToLower())
+            {
+                ViewBag.Role = "Owner";
             }
             return View(accountDetails);
         }
@@ -52,7 +66,7 @@ namespace ParentsBank.Controllers
         {
             accountDetails.OpenDate = DateTime.Now;
             accountDetails.Owner = User.Identity.Name;
-            ValidateAccountDetails(accountDetails,0);
+            ValidateAccountDetails(accountDetails);
             if (ModelState.IsValid)
             {
                 db.Accounts.Add(accountDetails);
@@ -85,7 +99,7 @@ namespace ParentsBank.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
         {
-            ValidateAccountDetails(accountDetails,1);
+            ValidateAccountDetails(accountDetails);
             if (ModelState.IsValid)
             {
                 db.Entry(accountDetails).State = EntityState.Modified;
@@ -138,10 +152,14 @@ namespace ParentsBank.Controllers
             base.Dispose(disposing);
         }
 
-        public bool CheckAccountRecipientEmail(string recipientEmail, int exCnt)
+        public bool CheckAccountRecipientEmail(string recipientEmail, int? accountId)
         {
-            int count = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower()).Count();
-            if (count > exCnt)
+            var countQuery = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower());
+            if(accountId != null)
+            {
+                countQuery.Where(acct => acct.Id != accountId);
+            }
+            if (countQuery.Count() > 0)
             {
                 return true;
             }
@@ -168,13 +186,13 @@ namespace ParentsBank.Controllers
             return false;
         }
 
-        public void ValidateAccountDetails(AccountDetails accountDetails, int exCnt)
+        public void ValidateAccountDetails(AccountDetails accountDetails)
         {
             if (accountDetails.Owner.ToLower().Equals(accountDetails.Recipient.ToLower()))
             {
                 ModelState.AddModelError("Recipient", "Recipient email cannot be same as owner email.");
             }
-            if (CheckAccountRecipientEmail(accountDetails.Recipient, exCnt))
+            if (CheckAccountRecipientEmail(accountDetails.Recipient, accountDetails.Id))
             {
                 ModelState.AddModelError("Recipient", "Recipient already has an account.");
             }

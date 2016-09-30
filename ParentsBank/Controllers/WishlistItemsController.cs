@@ -10,7 +10,8 @@ using System.Web.Mvc;
 using ParentsBank.Models;
 
 namespace ParentsBank.Controllers
-{
+{   
+    [Authorize]
     public class WishlistItemsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

@@ -9,7 +9,7 @@ namespace ParentsBank.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
         }
 
         protected override void Seed(ParentsBank.Models.ApplicationDbContext context)

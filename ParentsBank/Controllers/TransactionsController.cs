@@ -11,6 +11,7 @@ using ParentsBank.Models;
 
 namespace ParentsBank.Controllers
 {
+    [Authorize]
     public class TransactionsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
