@@ -45,7 +45,7 @@ namespace ParentsBank.Controllers
         {
             string user = User.Identity.Name;
             List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower() || model.Recipient.ToLower() == user.ToLower()).ToList();
-            if(list.Count == 0)
+            if (list.Count == 0)
             {
                 return RedirectToAction("Index", "AccountDetails");
             }
@@ -69,7 +69,7 @@ namespace ParentsBank.Controllers
             accountDetails.Balance += transaction.Amount;
             if (accountDetails.Balance < 0 && transaction.Amount < 0)
             {
-                ModelState.AddModelError("","Insufficient balance for transaction.");
+                ModelState.AddModelError("Amount", "Insufficient balance for transaction.");
             }
             if (transaction.TransactionDate < accountDetails.OpenDate)
             {
@@ -113,7 +113,7 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Edit([Bind(Include = "Id,AccountId,TransactionDate,Amount,Note")] Transaction transaction)
         {
             Transaction storedTransaction = db.Transactions.Where(tran => tran.Id == transaction.Id).ToList()[0];
-            AccountDetails accountDetails = await db.Accounts.FindAsync(transaction.AccountId);
+            AccountDetails accountDetails = await db.Accounts.FindAsync(storedTransaction.AccountId);
             string user = User.Identity.Name;
             if (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
             {
@@ -124,7 +124,7 @@ namespace ParentsBank.Controllers
             accountDetails.Balance += transaction.Amount;
             if (accountDetails.Balance < 0 && transaction.Amount < 0)
             {
-                ModelState.AddModelError("", "Insufficient balance for transaction.");
+                ModelState.AddModelError("Amount", "Insufficient balance for transaction.");
             }
             if (transaction.TransactionDate < accountDetails.OpenDate)
             {
@@ -132,6 +132,7 @@ namespace ParentsBank.Controllers
             }
             if (ModelState.IsValid)
             {
+                db.Entry(storedTransaction).State = EntityState.Detached;
                 db.Entry(transaction).State = EntityState.Modified;
                 db.Entry(accountDetails).State = EntityState.Modified;
                 await db.SaveChangesAsync();

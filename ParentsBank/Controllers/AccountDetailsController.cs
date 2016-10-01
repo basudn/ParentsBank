@@ -110,19 +110,15 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance,BeginBalance")] AccountDetails accountDetails)
         {
             AccountDetails storedDetails = db.Accounts.Where(acct => acct.Id == accountDetails.Id).ToList()[0];
-            accountDetails.BeginBalance = storedDetails.BeginBalance;
-            accountDetails.OpenDate = storedDetails.OpenDate;
-            accountDetails.Owner = storedDetails.Owner;
-            accountDetails.Balance = storedDetails.Balance;
-            if (storedDetails.Owner != User.Identity.Name)
+            storedDetails.Name = accountDetails.Name;
+            if (storedDetails.Owner == User.Identity.Name)
             {
-                accountDetails.Recipient = storedDetails.Recipient;
-                accountDetails.InterestRate = storedDetails.InterestRate;
+                storedDetails.Recipient = accountDetails.Recipient;
+                storedDetails.InterestRate = accountDetails.InterestRate;
             }
-            ValidateAccountDetails(accountDetails);
+            ValidateAccountDetails(storedDetails);
             if (ModelState.IsValid)
             {
-                db.Entry(accountDetails).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -166,7 +162,7 @@ namespace ParentsBank.Controllers
             }
             else
             {
-                ModelState.AddModelError("", "Cannot delete account with available balance.");
+                ModelState.AddModelError("Balance", "Cannot delete account with available balance.");
                 return View(accountDetails);
             }
         }
@@ -185,7 +181,7 @@ namespace ParentsBank.Controllers
             var countQuery = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower());
             if (accountId != null)
             {
-                countQuery.Where(acct => acct.Id != accountId);
+                countQuery = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower() && acct.Id != accountId);
             }
             if (countQuery.Count() > 0)
             {
