@@ -27,7 +27,7 @@ namespace ParentsBank.Controllers
             }
             else
             {
-                return View("Details", accounts[0]);
+                return RedirectToAction("Details", new { id = accounts[0].Id });
             }
         }
 
@@ -57,7 +57,7 @@ namespace ParentsBank.Controllers
             List<AccountDetails> accounts = db.Accounts.Where(acct => acct.Recipient == User.Identity.Name).ToList();
             if (accounts.Count > 0)
             {
-                return View("Details", accounts[0]);
+                return RedirectToAction("Details", new { id = accounts[0].Id });
             }
             return View();
         }
