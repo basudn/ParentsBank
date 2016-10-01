@@ -9,31 +9,34 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
         <h4>AccountDetails</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
-        @Html.HiddenFor(model => model.Owner)
-        @Html.HiddenFor(model => model.Balance)
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Owner, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Owner, new { htmlAttributes = new { @class = "form-control readonly", @readonly = "readonly" } })
-                @Html.ValidationMessageFor(model => model.Owner, "", new { @class = "text-danger" })
+        @if (ViewBag.Role == "Owner")
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Recipient, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Recipient, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Recipient, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Recipient, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Recipient, new { htmlAttributes = new { @class = "form-control readonly", @readonly = "readonly" } })
-                @Html.ValidationMessageFor(model => model.Recipient, "", new { @class = "text-danger" })
+        }
+        else
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Recipient, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Recipient, new { htmlAttributes = new { @class = "form-control readonly", @readonly = "readonly" } })
+                    @Html.ValidationMessageFor(model => model.Recipient, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>
-
+        }
+        
         <div class="form-group">
             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -50,11 +53,32 @@
             </div>
         </div>
 
+        @if (ViewBag.Role == "Owner")
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.InterestRate, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.InterestRate, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.InterestRate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.InterestRate, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.InterestRate, new { htmlAttributes = new { @class = "form-control readonly", @readonly = "readonly" } })
+                    @Html.ValidationMessageFor(model => model.InterestRate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
         <div class="form-group">
-            @Html.LabelFor(model => model.InterestRate, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Balance, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.InterestRate, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.InterestRate, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.Balance, new { htmlAttributes = new { @class = "form-control readonly", @readonly = "readonly" } })
+                @Html.ValidationMessageFor(model => model.Balance, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -65,7 +89,13 @@
         </div>
     </div>
 }
-
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @if (ViewBag.Role == "Owner")
+    {
+        @Html.ActionLink("Back to List", "Index")
+    }
+    else
+    {
+        @Html.ActionLink("Back to Details", "Details", new { id = Model.Id} )
+    }
 </div>

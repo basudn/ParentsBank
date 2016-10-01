@@ -63,6 +63,6 @@
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) 
     @if (ViewBag.Role == "Owner") {
-         @Html.ActionLink("Back to List", "Index")
+         <span>|</span> @Html.ActionLink("Back to List", "Index")
     }
 </p>

@@ -21,7 +21,7 @@ namespace ParentsBank.Controllers
         {
             string user = User.Identity.Name;
             List<AccountDetails> accounts = await db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower() || model.Recipient.ToLower() == user.ToLower()).ToListAsync();
-            if(accounts.Count() == 0 || accounts[0].Owner.ToLower() == user.ToLower())
+            if (accounts.Count() == 0 || accounts[0].Owner.ToLower() == user.ToLower())
             {
                 return View(accounts);
             }
@@ -44,7 +44,7 @@ namespace ParentsBank.Controllers
             {
                 return HttpNotFound();
             }
-            if(accountDetails.Owner.ToLower() == user.ToLower())
+            if (accountDetails.Owner.ToLower() == user.ToLower())
             {
                 ViewBag.Role = "Owner";
             }
@@ -54,6 +54,11 @@ namespace ParentsBank.Controllers
         // GET: AccountDetails/Create
         public ActionResult Create()
         {
+            List<AccountDetails> accounts = db.Accounts.Where(acct => acct.Recipient == User.Identity.Name).ToList();
+            if (accounts.Count > 0)
+            {
+                return View("Details", accounts[0]);
+            }
             return View();
         }
 
@@ -62,7 +67,7 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
+        public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance,BeginBalance")] AccountDetails accountDetails)
         {
             accountDetails.OpenDate = DateTime.Now;
             accountDetails.Owner = User.Identity.Name;
@@ -84,10 +89,15 @@ namespace ParentsBank.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            string user = User.Identity.Name;
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
-            if (accountDetails == null)
+            if (accountDetails == null || (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
+            }
+            if (accountDetails.Owner.ToLower() == user.ToLower())
+            {
+                ViewBag.Role = "Owner";
             }
             return View(accountDetails);
         }
@@ -97,8 +107,18 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance,BeginBalance")] AccountDetails accountDetails)
         {
+            AccountDetails storedDetails = db.Accounts.Where(acct => acct.Id == accountDetails.Id).ToList()[0];
+            accountDetails.BeginBalance = storedDetails.BeginBalance;
+            accountDetails.OpenDate = storedDetails.OpenDate;
+            accountDetails.Owner = storedDetails.Owner;
+            accountDetails.Balance = storedDetails.Balance;
+            if (storedDetails.Owner != User.Identity.Name)
+            {
+                accountDetails.Recipient = storedDetails.Recipient;
+                accountDetails.InterestRate = storedDetails.InterestRate;
+            }
             ValidateAccountDetails(accountDetails);
             if (ModelState.IsValid)
             {
@@ -117,11 +137,15 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
-            if (accountDetails == null)
+            string user = User.Identity.Name;
+            if (accountDetails == null || accountDetails.Owner.ToLower() != user.ToLower())
             {
                 return HttpNotFound();
             }
-            return View(accountDetails);
+            else
+            {
+                return View(accountDetails);
+            }
         }
 
         // POST: AccountDetails/Delete/5
@@ -130,6 +154,10 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
+            if (accountDetails.Owner != User.Identity.Name)
+            {
+                return HttpNotFound();
+            }
             if (accountDetails.Balance == 0)
             {
                 db.Accounts.Remove(accountDetails);
@@ -138,7 +166,7 @@ namespace ParentsBank.Controllers
             }
             else
             {
-                ModelState.AddModelError("", "Cannot delete account with balance.");
+                ModelState.AddModelError("", "Cannot delete account with available balance.");
                 return View(accountDetails);
             }
         }
@@ -155,7 +183,7 @@ namespace ParentsBank.Controllers
         public bool CheckAccountRecipientEmail(string recipientEmail, int? accountId)
         {
             var countQuery = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower());
-            if(accountId != null)
+            if (accountId != null)
             {
                 countQuery.Where(acct => acct.Id != accountId);
             }
