@@ -56,7 +56,8 @@
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Balance)
+            @Html.DisplayFor(model => model.Balance)<br />
+            @Html.ValidationMessageFor(model => model.Balance, "", new { @class = "text-danger" })
         </dd>
 
     </dl>

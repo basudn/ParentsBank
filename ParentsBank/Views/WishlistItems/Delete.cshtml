@@ -64,7 +64,8 @@
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.Purchased)
+            @Html.DisplayFor(model => model.Purchased)<br />
+            @Html.ValidationMessageFor(model => model.Purchased, "", new { @class = "text-danger" })
         </dd>
 
     </dl>

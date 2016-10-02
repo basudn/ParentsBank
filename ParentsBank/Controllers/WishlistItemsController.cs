@@ -10,7 +10,8 @@ using System.Web.Mvc;
 using ParentsBank.Models;
 
 namespace ParentsBank.Controllers
-{
+{   
+    [Authorize]
     public class WishlistItemsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -19,7 +20,7 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Index()
         {
             string user = User.Identity.Name;
-            var wishlistItems = db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower()).Union(db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Recipient.ToLower() == user.ToLower()));
+            var wishlistItems = db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower() || w.Account.Recipient.ToLower() == user.ToLower());
             return View(await wishlistItems.ToListAsync());
         }
 
@@ -31,7 +32,8 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             WishlistItem wishlistItem = await db.WishlistItems.FindAsync(id);
-            if (wishlistItem == null)
+            string user = User.Identity.Name;
+            if (wishlistItem == null || (wishlistItem.Account.Owner.ToLower() != user.ToLower() && wishlistItem.Account.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
             }
@@ -42,7 +44,11 @@ namespace ParentsBank.Controllers
         public ActionResult Create()
         {
             string user = User.Identity.Name;
-            List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower()).Union(db.Accounts.Where(model => model.Recipient.ToLower() == user.ToLower())).ToList();
+            List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower() || model.Recipient.ToLower() == user.ToLower()).ToList();
+            if (list.Count == 0)
+            {
+                return RedirectToAction("Index", "AccountDetails");
+            }
             ViewBag.AccountId = PopulateAccountSelectItems(list, null);
             return View();
         }
@@ -54,6 +60,12 @@ namespace ParentsBank.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,AccountId,DateAdded,Cost,Description,Link,Purchased")] WishlistItem wishlistItem)
         {
+            AccountDetails accountDetails = await db.Accounts.FindAsync(wishlistItem.AccountId);
+            string user = User.Identity.Name;
+            if (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
+            {
+                return HttpNotFound();
+            }
             wishlistItem.DateAdded = DateTime.Now;
             if (ModelState.IsValid)
             {
@@ -61,8 +73,6 @@ namespace ParentsBank.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-
-            string user = User.Identity.Name;
             List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower()).Union(db.Accounts.Where(model => model.Recipient.ToLower() == user.ToLower())).ToList();
             ViewBag.AccountId = PopulateAccountSelectItems(list, wishlistItem.AccountId);
             return View(wishlistItem);
@@ -76,11 +86,11 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             WishlistItem wishlistItem = await db.WishlistItems.FindAsync(id);
-            if (wishlistItem == null)
+            string user = User.Identity.Name;
+            if (wishlistItem == null || (wishlistItem.Account.Owner.ToLower() != user.ToLower() && wishlistItem.Account.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
             }
-            string user = User.Identity.Name;
             List<AccountDetails> list = db.Accounts.Where(acct => acct.Id == wishlistItem.AccountId).ToList();
             ViewBag.AccountId = PopulateAccountSelectItems(list, null);
             return View(wishlistItem);
@@ -93,13 +103,21 @@ namespace ParentsBank.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,AccountId,DateAdded,Cost,Description,Link,Purchased")] WishlistItem wishlistItem)
         {
+            WishlistItem storedWishlist = db.WishlistItems.Where(wish => wish.Id == wishlistItem.Id).ToList()[0];
+            AccountDetails accountDetails = await db.Accounts.FindAsync(storedWishlist.AccountId);
+            string user = User.Identity.Name;
+            if (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
+            {
+                return HttpNotFound();
+            }
+            wishlistItem.AccountId = storedWishlist.AccountId;
             if (ModelState.IsValid)
             {
+                db.Entry(storedWishlist).State = EntityState.Detached;
                 db.Entry(wishlistItem).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            string user = User.Identity.Name;
             List<AccountDetails> list = db.Accounts.Where(acct => acct.Id == wishlistItem.AccountId).ToList();
             ViewBag.AccountId = PopulateAccountSelectItems(list, null);
             return View(wishlistItem);
@@ -113,7 +131,8 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             WishlistItem wishlistItem = await db.WishlistItems.FindAsync(id);
-            if (wishlistItem == null)
+            string user = User.Identity.Name;
+            if (wishlistItem == null || (wishlistItem.Account.Owner.ToLower() != user.ToLower() && wishlistItem.Account.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
             }
@@ -127,9 +146,13 @@ namespace ParentsBank.Controllers
         {
             WishlistItem wishlistItem = await db.WishlistItems.FindAsync(id);
             string user = User.Identity.Name;
-            if (wishlistItem.Account.Recipient.ToLower().Equals(user.ToLower()))
+            if (wishlistItem.Account.Owner.ToLower() != user.ToLower() && wishlistItem.Account.Recipient.ToLower() != user.ToLower())
             {
-                ModelState.AddModelError("","Recipient cannot delete a wishlist item.");
+                return HttpNotFound();
+            }
+            if (wishlistItem.Account.Recipient.ToLower() == user.ToLower())
+            {
+                ModelState.AddModelError("Purchased", "Recipient cannot delete a wishlist item.");
                 return View(wishlistItem);
             }
             else {
@@ -154,7 +177,7 @@ namespace ParentsBank.Controllers
             foreach (AccountDetails account in list)
             {
                 SelectListItem item = new SelectListItem();
-                item.Text = account.Owner.ToLower() + ", " + account.Recipient.ToLower();
+                item.Text = account.Id + " [" + account.Name + "]";
                 item.Value = account.Id.ToString();
                 if (accountId == account.Id)
                 {

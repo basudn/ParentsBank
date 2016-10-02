@@ -25,6 +25,7 @@ namespace ParentsBank.Models
         [CustomValidation(typeof(CustomFieldValidations),"ValidateInterestRate")]
         public double InterestRate { get; set; }
         public double Balance { get; set; }
+        public double BeginBalance { get; set; }
         public virtual List<Transaction> Transactions { get; set; }
         public virtual List<WishlistItem> WishlistItems { get; set; }
 

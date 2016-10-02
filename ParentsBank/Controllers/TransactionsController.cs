@@ -11,6 +11,7 @@ using ParentsBank.Models;
 
 namespace ParentsBank.Controllers
 {
+    [Authorize]
     public class TransactionsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -19,7 +20,7 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Index()
         {
             string user = User.Identity.Name;
-            var transactions = db.Transactions.Include(t => t.Account).Where(t => t.Account.Owner.ToLower() == user.ToLower()).Union(db.Transactions.Include(t => t.Account).Where(t => t.Account.Recipient.ToLower() == user.ToLower()));
+            var transactions = db.Transactions.Include(t => t.Account).Where(t => t.Account.Owner.ToLower() == user.ToLower() || t.Account.Recipient.ToLower() == user.ToLower());
             return View(await transactions.ToListAsync());
         }
 
@@ -31,7 +32,8 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Transaction transaction = await db.Transactions.FindAsync(id);
-            if (transaction == null)
+            string user = User.Identity.Name;
+            if (transaction == null || (transaction.Account.Owner.ToLower() != user.ToLower() && transaction.Account.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
             }
@@ -42,7 +44,11 @@ namespace ParentsBank.Controllers
         public ActionResult Create()
         {
             string user = User.Identity.Name;
-            List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower()).Union(db.Accounts.Where(model => model.Recipient.ToLower() == user.ToLower())).ToList();
+            List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower() || model.Recipient.ToLower() == user.ToLower()).ToList();
+            if (list.Count == 0)
+            {
+                return RedirectToAction("Index", "AccountDetails");
+            }
             ViewBag.AccountId = PopulateAccountSelectItems(list, null);
             return View();
         }
@@ -55,10 +61,19 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Create([Bind(Include = "Id,AccountId,TransactionDate,Amount,Note")] Transaction transaction)
         {
             AccountDetails accountDetails = await db.Accounts.FindAsync(transaction.AccountId);
-            accountDetails.Balance += transaction.Amount;
-            if (accountDetails.Balance < 0)
+            string user = User.Identity.Name;
+            if(accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
             {
-                ModelState.AddModelError("","Insufficient balance for transaction.");
+                return HttpNotFound();
+            }
+            accountDetails.Balance += transaction.Amount;
+            if (accountDetails.Balance < 0 && transaction.Amount < 0)
+            {
+                ModelState.AddModelError("Amount", "Insufficient balance for transaction.");
+            }
+            if (transaction.TransactionDate < accountDetails.OpenDate)
+            {
+                ModelState.AddModelError("TransactionDate", "Transaction date cannot be prior to open date.");
             }
             if (ModelState.IsValid)
             {
@@ -67,8 +82,7 @@ namespace ParentsBank.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            string user = User.Identity.Name;
-            List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower()).Union(db.Accounts.Where(model => model.Recipient.ToLower() == user.ToLower())).ToList();
+            List<AccountDetails> list = db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower() || model.Recipient.ToLower() == user.ToLower()).ToList();
             ViewBag.AccountId = PopulateAccountSelectItems(list, transaction.AccountId);
             return View(transaction);
         }
@@ -81,11 +95,11 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Transaction transaction = await db.Transactions.FindAsync(id);
-            if (transaction == null)
+            string user = User.Identity.Name;
+            if (transaction == null || (transaction.Account.Owner.ToLower() != user.ToLower() && transaction.Account.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
             }
-            string user = User.Identity.Name;
             List<AccountDetails> list = db.Accounts.Where(acct => acct.Id == transaction.AccountId).ToList();
             ViewBag.AccountId = PopulateAccountSelectItems(list, null);
             return View(transaction);
@@ -98,13 +112,32 @@ namespace ParentsBank.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "Id,AccountId,TransactionDate,Amount,Note")] Transaction transaction)
         {
+            Transaction storedTransaction = db.Transactions.Where(tran => tran.Id == transaction.Id).ToList()[0];
+            AccountDetails accountDetails = await db.Accounts.FindAsync(storedTransaction.AccountId);
+            string user = User.Identity.Name;
+            if (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
+            {
+                return HttpNotFound();
+            }
+            transaction.AccountId = storedTransaction.AccountId;
+            accountDetails.Balance -= storedTransaction.Amount;
+            accountDetails.Balance += transaction.Amount;
+            if (accountDetails.Balance < 0 && transaction.Amount < 0)
+            {
+                ModelState.AddModelError("Amount", "Insufficient balance for transaction.");
+            }
+            if (transaction.TransactionDate < accountDetails.OpenDate)
+            {
+                ModelState.AddModelError("TransactionDate", "Transaction date cannot be prior to open date.");
+            }
             if (ModelState.IsValid)
             {
+                db.Entry(storedTransaction).State = EntityState.Detached;
                 db.Entry(transaction).State = EntityState.Modified;
+                db.Entry(accountDetails).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            string user = User.Identity.Name;
             List<AccountDetails> list = db.Accounts.Where(acct => acct.Id == transaction.AccountId).ToList();
             ViewBag.AccountId = PopulateAccountSelectItems(list, null);
             return View(transaction);
@@ -118,7 +151,8 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Transaction transaction = await db.Transactions.FindAsync(id);
-            if (transaction == null)
+            string user = User.Identity.Name;
+            if (transaction == null || (transaction.Account.Owner.ToLower() != user.ToLower() && transaction.Account.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
             }
@@ -131,6 +165,14 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             Transaction transaction = await db.Transactions.FindAsync(id);
+            AccountDetails accountDetails = await db.Accounts.FindAsync(transaction.AccountId);
+            string user = User.Identity.Name;
+            if (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
+            {
+                return HttpNotFound();
+            }
+            accountDetails.Balance -= transaction.Amount;
+            db.Entry(accountDetails).State = EntityState.Modified;
             db.Transactions.Remove(transaction);
             await db.SaveChangesAsync();
             return RedirectToAction("Index");
@@ -151,7 +193,7 @@ namespace ParentsBank.Controllers
             foreach (AccountDetails account in list)
             {
                 SelectListItem item = new SelectListItem();
-                item.Text = account.Owner.ToLower() + ", " + account.Recipient.ToLower();
+                item.Text = account.Id + " [" + account.Name + "]";
                 item.Value = account.Id.ToString();
                 if (accountId == account.Id)
                 {

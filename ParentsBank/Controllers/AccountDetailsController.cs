@@ -11,6 +11,7 @@ using ParentsBank.Models;
 
 namespace ParentsBank.Controllers
 {
+    [Authorize]
     public class AccountDetailsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -19,7 +20,15 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Index()
         {
             string user = User.Identity.Name;
-            return View(await db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower()).Union(db.Accounts.Where(model => model.Recipient.ToLower() == user.ToLower())).ToListAsync());
+            List<AccountDetails> accounts = await db.Accounts.Where(model => model.Owner.ToLower() == user.ToLower() || model.Recipient.ToLower() == user.ToLower()).ToListAsync();
+            if (accounts.Count() == 0 || accounts[0].Owner.ToLower() == user.ToLower())
+            {
+                return View(accounts);
+            }
+            else
+            {
+                return RedirectToAction("Details", new { id = accounts[0].Id });
+            }
         }
 
         // GET: AccountDetails/Details/5
@@ -29,10 +38,15 @@ namespace ParentsBank.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            string user = User.Identity.Name;
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
-            if (accountDetails == null)
+            if (accountDetails == null || (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
+            }
+            if (accountDetails.Owner.ToLower() == user.ToLower())
+            {
+                ViewBag.Role = "Owner";
             }
             return View(accountDetails);
         }
@@ -40,6 +54,11 @@ namespace ParentsBank.Controllers
         // GET: AccountDetails/Create
         public ActionResult Create()
         {
+            List<AccountDetails> accounts = db.Accounts.Where(acct => acct.Recipient == User.Identity.Name).ToList();
+            if (accounts.Count > 0)
+            {
+                return RedirectToAction("Details", new { id = accounts[0].Id });
+            }
             return View();
         }
 
@@ -48,11 +67,11 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
+        public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance,BeginBalance")] AccountDetails accountDetails)
         {
             accountDetails.OpenDate = DateTime.Now;
             accountDetails.Owner = User.Identity.Name;
-            ValidateAccountDetails(accountDetails,0);
+            ValidateAccountDetails(accountDetails);
             if (ModelState.IsValid)
             {
                 db.Accounts.Add(accountDetails);
@@ -70,10 +89,15 @@ namespace ParentsBank.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
+            string user = User.Identity.Name;
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
-            if (accountDetails == null)
+            if (accountDetails == null || (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
+            }
+            if (accountDetails.Owner.ToLower() == user.ToLower())
+            {
+                ViewBag.Role = "Owner";
             }
             return View(accountDetails);
         }
@@ -83,12 +107,18 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance,BeginBalance")] AccountDetails accountDetails)
         {
-            ValidateAccountDetails(accountDetails,1);
+            AccountDetails storedDetails = db.Accounts.Where(acct => acct.Id == accountDetails.Id).ToList()[0];
+            storedDetails.Name = accountDetails.Name;
+            if (storedDetails.Owner == User.Identity.Name)
+            {
+                storedDetails.Recipient = accountDetails.Recipient;
+                storedDetails.InterestRate = accountDetails.InterestRate;
+            }
+            ValidateAccountDetails(storedDetails);
             if (ModelState.IsValid)
             {
-                db.Entry(accountDetails).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -103,11 +133,15 @@ namespace ParentsBank.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
-            if (accountDetails == null)
+            string user = User.Identity.Name;
+            if (accountDetails == null || accountDetails.Owner.ToLower() != user.ToLower())
             {
                 return HttpNotFound();
             }
-            return View(accountDetails);
+            else
+            {
+                return View(accountDetails);
+            }
         }
 
         // POST: AccountDetails/Delete/5
@@ -116,6 +150,10 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
+            if (accountDetails.Owner != User.Identity.Name)
+            {
+                return HttpNotFound();
+            }
             if (accountDetails.Balance == 0)
             {
                 db.Accounts.Remove(accountDetails);
@@ -124,7 +162,7 @@ namespace ParentsBank.Controllers
             }
             else
             {
-                ModelState.AddModelError("", "Cannot delete account with balance.");
+                ModelState.AddModelError("Balance", "Cannot delete account with available balance.");
                 return View(accountDetails);
             }
         }
@@ -138,10 +176,14 @@ namespace ParentsBank.Controllers
             base.Dispose(disposing);
         }
 
-        public bool CheckAccountRecipientEmail(string recipientEmail, int exCnt)
+        public bool CheckAccountRecipientEmail(string recipientEmail, int? accountId)
         {
-            int count = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower()).Count();
-            if (count > exCnt)
+            var countQuery = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower());
+            if (accountId != null)
+            {
+                countQuery = db.Accounts.Where(acct => acct.Recipient.ToLower() == recipientEmail.ToLower() && acct.Id != accountId);
+            }
+            if (countQuery.Count() > 0)
             {
                 return true;
             }
@@ -168,13 +210,13 @@ namespace ParentsBank.Controllers
             return false;
         }
 
-        public void ValidateAccountDetails(AccountDetails accountDetails, int exCnt)
+        public void ValidateAccountDetails(AccountDetails accountDetails)
         {
             if (accountDetails.Owner.ToLower().Equals(accountDetails.Recipient.ToLower()))
             {
                 ModelState.AddModelError("Recipient", "Recipient email cannot be same as owner email.");
             }
-            if (CheckAccountRecipientEmail(accountDetails.Recipient, exCnt))
+            if (CheckAccountRecipientEmail(accountDetails.Recipient, accountDetails.Id))
             {
                 ModelState.AddModelError("Recipient", "Recipient already has an account.");
             }
