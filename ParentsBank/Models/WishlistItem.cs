@@ -17,6 +17,9 @@ namespace ParentsBank.Models
         [Display(Name = "Date Added")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime DateAdded { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Name { get; set; }
         [CustomValidation(typeof(CustomFieldValidations), "ValidateItemCost")]
         public double Cost { get; set; }
         [Required]

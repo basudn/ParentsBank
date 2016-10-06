@@ -67,7 +67,7 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance,BeginBalance")] AccountDetails accountDetails)
+        public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
         {
             accountDetails.OpenDate = DateTime.Now;
             accountDetails.Owner = User.Identity.Name;
@@ -107,7 +107,7 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance,BeginBalance")] AccountDetails accountDetails)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
         {
             AccountDetails storedDetails = db.Accounts.Where(acct => acct.Id == accountDetails.Id).ToList()[0];
             storedDetails.Name = accountDetails.Name;

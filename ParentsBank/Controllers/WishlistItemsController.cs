@@ -78,7 +78,7 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,AccountId,DateAdded,Cost,Description,Link")] WishlistItem wishlistItem)
+        public async Task<ActionResult> Create([Bind(Include = "Id,AccountId,DateAdded,Name,Cost,Description,Link")] WishlistItem wishlistItem)
         {
             AccountDetails accountDetails = await db.Accounts.FindAsync(wishlistItem.AccountId);
             string user = User.Identity.Name;
@@ -122,7 +122,7 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit([Bind(Include = "Id,AccountId,DateAdded,Cost,Description,Link,Purchased")] WishlistItem wishlistItem)
+        public async Task<ActionResult> Edit([Bind(Include = "Id,AccountId,DateAdded,Name,Cost,Description,Link,Purchased")] WishlistItem wishlistItem)
         {
             WishlistItem storedWishlist = db.WishlistItems.Where(wish => wish.Id == wishlistItem.Id).ToList()[0];
             AccountDetails accountDetails = await db.Accounts.FindAsync(storedWishlist.AccountId);
