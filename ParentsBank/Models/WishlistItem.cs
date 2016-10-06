@@ -14,6 +14,7 @@ namespace ParentsBank.Models
         public int Id { get; set; }
         public virtual int AccountId { get; set; }
         public virtual AccountDetails Account { get; set; }
+        [Display(Name = "Date Added")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime DateAdded { get; set; }
         [CustomValidation(typeof(CustomFieldValidations), "ValidateItemCost")]

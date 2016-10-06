@@ -17,8 +17,8 @@ namespace ParentsBank.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: WishlistItems
-        public async Task<ActionResult> Index()
-        {
+        public async Task<ActionResult> Index(int? id)
+        { 
             string user = User.Identity.Name;
             List<WishlistItem> wishlistItems = await db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower() || w.Account.Recipient.ToLower() == user.ToLower()).ToListAsync();
             int countAfford = 0;

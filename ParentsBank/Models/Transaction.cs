@@ -14,6 +14,7 @@ namespace ParentsBank.Models
         public int Id { get; set; }
         public virtual int AccountId { get; set; }
         public virtual AccountDetails Account { get; set; }
+        [Display(Name = "Transaction Date")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         [CustomValidation(typeof(CustomFieldValidations),"ValidateTransactionDate")]
         public DateTime TransactionDate { get; set; }

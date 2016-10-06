@@ -17,11 +17,17 @@ namespace ParentsBank.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Transactions
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(int? id)
         {
+            
             string user = User.Identity.Name;
             var transactions = db.Transactions.Include(t => t.Account).Where(t => t.Account.Owner.ToLower() == user.ToLower() || t.Account.Recipient.ToLower() == user.ToLower());
+            if (id != null)
+            {
+                transactions = transactions.Where(t => t.Account.Id == id);
+            }
             return View(await transactions.ToListAsync());
+
         }
 
         // GET: Transactions/Details/5
@@ -62,7 +68,7 @@ namespace ParentsBank.Controllers
         {
             AccountDetails accountDetails = await db.Accounts.FindAsync(transaction.AccountId);
             string user = User.Identity.Name;
-            if(accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
+            if (accountDetails.Owner.ToLower() != user.ToLower() && accountDetails.Recipient.ToLower() != user.ToLower())
             {
                 return HttpNotFound();
             }
@@ -202,6 +208,7 @@ namespace ParentsBank.Controllers
                 selectList.Add(item);
             }
             return selectList;
+       
         }
     }
 }
