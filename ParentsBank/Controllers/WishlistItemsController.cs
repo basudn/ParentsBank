@@ -17,11 +17,31 @@ namespace ParentsBank.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: WishlistItems
-        public async Task<ActionResult> Index()
-        {
+        public async Task<ActionResult> Index(int? id)
+        { 
             string user = User.Identity.Name;
-            var wishlistItems = db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower() || w.Account.Recipient.ToLower() == user.ToLower());
-            return View(await wishlistItems.ToListAsync());
+            var wishlistQuery = db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower() || w.Account.Recipient.ToLower() == user.ToLower());
+            if(id != null)
+            {
+                wishlistQuery = wishlistQuery.Where(w => w.Account.Id == id);
+            }
+            List<WishlistItem> wishlistItems = await wishlistQuery.ToListAsync();
+            int countAfford = 0;
+            int countCompleted = 0;
+            foreach (WishlistItem item in wishlistItems)
+            {
+                if (item.Purchased)
+                {
+                    countCompleted++;
+                }
+                else if (item.Cost <= item.Account.Balance)
+                {
+                    countAfford++;
+                }
+            }
+            ViewBag.CompletedItems = countCompleted;
+            ViewBag.AffordableItems = countAfford; 
+            return View(wishlistItems);
         }
 
         // GET: WishlistItems/Details/5
@@ -58,7 +78,7 @@ namespace ParentsBank.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create([Bind(Include = "Id,AccountId,DateAdded,Cost,Description,Link,Purchased")] WishlistItem wishlistItem)
+        public async Task<ActionResult> Create([Bind(Include = "Id,AccountId,DateAdded,Cost,Description,Link")] WishlistItem wishlistItem)
         {
             AccountDetails accountDetails = await db.Accounts.FindAsync(wishlistItem.AccountId);
             string user = User.Identity.Name;
@@ -69,6 +89,7 @@ namespace ParentsBank.Controllers
             wishlistItem.DateAdded = DateTime.Now;
             if (ModelState.IsValid)
             {
+                wishlistItem.Purchased = false;
                 db.WishlistItems.Add(wishlistItem);
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
