@@ -13,16 +13,17 @@ namespace ParentsBank.Controllers
             return View();
         }
 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Financial Resources.";
-
-            return View();
-        }
+   
 
         public ActionResult Contact()
         {
             ViewBag.Message = "Contact Us.";
+
+            return View();
+        }
+        public ActionResult Resources()
+        {
+            ViewBag.Message = "Financial Resources";
 
             return View();
         }

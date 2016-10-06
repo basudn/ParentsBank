@@ -28,7 +28,7 @@
                         <li>@Html.ActionLink("Transactions", "Index", "Transactions")</li>
                         <li>@Html.ActionLink("Wishlist Items", "Index", "WishlistItems")</li>
                     }
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Financial Resources", "Resources", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
@@ -37,8 +37,8 @@
     </div>
     <div class="container body-content">
         @RenderBody()
-      
-        
+
+
     </div>
 
     @Scripts.Render("~/bundles/jquery")

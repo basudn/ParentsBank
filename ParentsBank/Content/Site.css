@@ -1,9 +1,13 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    background-position: center;
+    background-image:url(../../Content/ParchmentPaper.jpg);
+    background-repeat:repeat;
 }
 
-/* Set padding to keep content from hitting the edges */
+/* Set padding to keep content from hitting the edges 
+*/
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
@@ -52,6 +56,17 @@ textarea {
     border: 2px solid #666;
     color:black;
     text-align: center;
-    font: 32px, Arial, sans-serif;
+    font-size: 32px;
+    font-family: Arial sans-serif;
+    display: inline-block;
+    line-height: 32px;
+    margin-right: 20px;
+   
+}
+.resource{
+    font-size: 30px;
+    font-family: 'Felix Titling' sans-serif;
+    color:black;
+   
 
 }
