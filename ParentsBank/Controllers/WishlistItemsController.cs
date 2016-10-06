@@ -20,7 +20,12 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Index(int? id)
         { 
             string user = User.Identity.Name;
-            List<WishlistItem> wishlistItems = await db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower() || w.Account.Recipient.ToLower() == user.ToLower()).ToListAsync();
+            var wishlistQuery = db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower() || w.Account.Recipient.ToLower() == user.ToLower());
+            if(id != null)
+            {
+                wishlistQuery = wishlistQuery.Where(w => w.Account.Id == id);
+            }
+            List<WishlistItem> wishlistItems = await wishlistQuery.ToListAsync();
             int countAfford = 0;
             int countCompleted = 0;
             foreach (WishlistItem item in wishlistItems)
