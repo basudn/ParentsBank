@@ -5,7 +5,7 @@
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
-    <li>@Html.ActionLink(Model.Account.Name+"'s Wishlist", "Index", "WishlistItems", new { id = Model.Account.Id }, new { })</li>
+    <li>@Html.ActionLink(Model.Account.Name + "'s Wishlist", "AccountWishlist", "WishlistItems", new { id = Model.Account.Id }, new { })</li>
     <li>@Html.ActionLink(Model.Name, "Details", "WishlistItems", new { id = Model.Id }, new { })</li>
     <li class="active">Edit</li>
 </ol>
@@ -22,9 +22,9 @@
         @Html.HiddenFor(model => model.Id)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.AccountId, "AccountId", htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.AccountId, "Account Id", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownList("AccountId", null, htmlAttributes: new { @class = "form-control disabled", @disabled = "disabled" })
+                @Html.DropDownList("AccountId", null, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.AccountId, "", new { @class = "text-danger" })
             </div>
         </div>

@@ -3,7 +3,15 @@
 @{
     ViewBag.Title = "Edit";
 }
-
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    @if (ViewBag.Role == "Owner")
+    {
+        <li>@Html.ActionLink("Accounts", "Index", "AccountDetails")</li>
+    }
+    <li>@Html.ActionLink(@Model.Name+"'s Account", "Details", "AccountDetails", new { id = Model.Id }, new { })</li>
+    <li class="active">Edit</li>
+</ol>
 <h2>Edit</h2>
 
 @using (Html.BeginForm())

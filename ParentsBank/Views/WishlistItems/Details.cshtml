@@ -3,7 +3,11 @@
 @{
     ViewBag.Title = "Details";
 }
-
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    <li>@Html.ActionLink(Model.Account.Name + "'s Wishlist", "AccountWishlist", "WishlistItems", new { id = Model.Account.Id }, new { })</li>
+    <li class="active">Details</li>
+</ol>
 <h2>Wishlist Item Details</h2>
 
 <div>

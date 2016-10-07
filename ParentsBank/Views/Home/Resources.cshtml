@@ -1,12 +1,11 @@
 ﻿@{
-    ViewBag.Title = "Home Page";
+    ViewBag.Title = "Resources";
 }
-
-<html>
-<body>
-
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    <li class="active">Resources</li>
+</ol>
     <div class="row">
-        <br />
         <br />
         <div class="col-md-6 resource" style="border:solid black 3px; background-color:#ffff80" >
        
@@ -40,6 +39,3 @@
     </div>
 
     <div class="text-center"><img src="~/content/check.png" /></div>
-</body>
-
-</html>

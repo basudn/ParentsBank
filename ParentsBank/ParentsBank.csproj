@@ -296,6 +296,7 @@
     <Content Include="Views\WishlistItems\Edit.cshtml" />
     <Content Include="Views\WishlistItems\Index.cshtml" />
     <Content Include="Views\Home\Resources.cshtml" />
+    <Content Include="Views\WishlistItems\Search.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

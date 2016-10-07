@@ -3,7 +3,12 @@
 @{
     ViewBag.Title = "Delete";
 }
-
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    <li>@Html.ActionLink(Model.Account.Name + "'s Wishlist", "AccountWishlist", "WishlistItems", new { id = Model.Account.Id }, new { })</li>
+    <li>@Html.ActionLink(Model.Name, "Details", "WishlistItems", new { id = Model.Id }, new { })</li>
+    <li class="active">Delete</li>
+</ol>
 <h2>Delete Wishlist Item</h2>
 
 <h3>Are you sure you want to delete this?</h3>
@@ -78,7 +83,8 @@
 
     </dl>
 
-    @using (Html.BeginForm()) {
+    @using (Html.BeginForm())
+    {
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">

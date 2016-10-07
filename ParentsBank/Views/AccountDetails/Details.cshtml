@@ -3,7 +3,14 @@
 @{
     ViewBag.Title = "Details";
 }
-
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+    @if (ViewBag.Role == "Owner")
+    {
+        <li>@Html.ActionLink("Accounts", "Index", "AccountDetails")</li>
+    }
+    <li class="active">@Model.Name's Account</li>
+</ol>
 <h2>Details</h2>
 
 <div>
@@ -62,10 +69,11 @@
 </div>
 <p>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("View Transactions", "Index", new { id = Model.Id }) |
-    @Html.ActionLink("View Wishlist", "Index", new { id = Model.Id})
-    @if (ViewBag.Role == "Owner") {
-         <span>|</span> @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("View Transactions", "AccountTransactions", "Transactions", new { id = Model.Id }, new { }) |
+    @Html.ActionLink("View Wishlist", "AccountWishlist", "WishlistItems", new { id = Model.Id }, new { })
+    @if (ViewBag.Role == "Owner")
+    {
+        <span>|</span> @Html.ActionLink("Back to List", "Index")
     }
-    
+
 </p>

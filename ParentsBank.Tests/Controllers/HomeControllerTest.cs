@@ -26,13 +26,13 @@ namespace ParentsBank.Tests.Controllers
         }
 
         [TestMethod]
-        public void About()
+        public void Resources()
         {
             // Arrange
             HomeController controller = new HomeController();
 
             // Act
-            ViewResult result = controller.About() as ViewResult;
+            ViewResult result = controller.Resources() as ViewResult;
 
             // Assert
             Assert.AreEqual("Your application description page.", result.ViewBag.Message);

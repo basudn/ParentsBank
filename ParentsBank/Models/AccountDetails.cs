@@ -20,8 +20,10 @@ namespace ParentsBank.Models
         [Required]
         [StringLength(100)]
         public string Name { get; set; }
+        [Display(Name = "Open Date")]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime OpenDate { get; set; }
+        [Display(Name = "Interest Rate")]
         [CustomValidation(typeof(CustomFieldValidations),"ValidateInterestRate")]
         public double InterestRate { get; set; }
         public double Balance { get; set; }
