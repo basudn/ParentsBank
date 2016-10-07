@@ -3,6 +3,9 @@ using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using ParentsBank.CustomValidations;
+using System.Data;
+using System.Data.Entity;
+using System.Linq;
 
 namespace ParentsBank.Models
 {
@@ -24,7 +27,7 @@ namespace ParentsBank.Models
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime OpenDate { get; set; }
         [Display(Name = "Interest Rate")]
-        [CustomValidation(typeof(CustomFieldValidations),"ValidateInterestRate")]
+        [CustomValidation(typeof(CustomFieldValidations), "ValidateInterestRate")]
         public double InterestRate { get; set; }
         public double Balance { get; set; }
         public virtual List<Transaction> Transactions { get; set; }
@@ -38,8 +41,48 @@ namespace ParentsBank.Models
 
         public double CalculateInterestEarnedInCurrentYear()
         {
-            return 0.0;
+            ApplicationDbContext db = new ApplicationDbContext();
+            var firstDay = new DateTime(DateTime.Now.Year, 1, 1);
+            var lastDay = new DateTime(DateTime.Now.Year, 12, 31);
+            var yearlyDaysInt = lastDay.DayOfYear;
+            double runningTotal = 0.00000;
+            double yearlyAmount = 0.0;
+            var today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+            var it_date = firstDay;
+            var it_date2 = firstDay;
+            DateTime previous = firstDay;
+            List<Transaction> listTrans = db.Transactions.Where(t => t.Account.Id == Id && t.TransactionDate >= firstDay).ToList();
+            while (it_date2 != today)
+            {
+                foreach (var it_trans in listTrans)
+                {
+                    if (it_trans.TransactionDate.Equals(it_date2))
+                    {
+                        yearlyAmount += it_trans.Amount;
+                    }
+                }
+                it_date2 = it_date2.AddDays(1);
+            }
+
+            if (Balance > yearlyAmount)
+            {
+                var beginningbalance = Balance - yearlyAmount;
+                runningTotal = beginningbalance;
+            }
+            while (it_date != today)
+            {
+                //DateTime end = firstDay;
+                foreach (var it_trans in listTrans)
+                {
+                    if (it_trans.TransactionDate.Equals(it_date))
+                    {
+                        runningTotal += it_trans.Amount;
+                    }
+                }
+                runningTotal = runningTotal * Math.Pow(1.0 + (InterestRate / (100 * 12)), (12.0 * 1 / yearlyDaysInt));
+                it_date = it_date.AddDays(1);
+            }
+            return Math.Round(runningTotal - yearlyAmount, 2);
         }
-        
     }
 }

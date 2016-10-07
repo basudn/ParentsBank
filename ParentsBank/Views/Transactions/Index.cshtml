@@ -72,9 +72,15 @@
                     @Html.DisplayFor(modelItem => item.Note)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    @if (ViewBag.Role == "Owner")
+                    {
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span>|</span>
+                    }
+                    @Html.ActionLink("Details", "Details", new { id = item.Id })
+                    @if (ViewBag.Role == "Owner")
+                    {
+                        <span>|</span> @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    }
                 </td>
             </tr>
         }

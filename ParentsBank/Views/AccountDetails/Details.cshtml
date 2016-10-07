@@ -64,6 +64,14 @@
         <dd>
             @Html.DisplayFor(model => model.Balance)
         </dd>
+        
+        <dt>
+            @Html.DisplayName("Interest Calculated")
+        </dt>
+
+        <dd>
+            @Model.CalculateInterestEarnedInCurrentYear()
+        </dd>
 
     </dl>
 </div>

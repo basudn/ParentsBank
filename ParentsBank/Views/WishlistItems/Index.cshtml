@@ -70,7 +70,7 @@
                     {
                         <span class="badge" style="background-color: #5cb85c;">&nbsp;</span>
                     }
-                    else if (item.Cost <= item.Account.Balance)
+                    else if (item.Cost <= (item.Account.Balance+item.Account.CalculateInterestEarnedInCurrentYear()))
                     {
                         <span class="badge" style="background-color: #f0ad4e;">&nbsp;</span>
                     }

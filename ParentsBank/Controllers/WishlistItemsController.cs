@@ -30,7 +30,7 @@ namespace ParentsBank.Controllers
                 {
                     countCompleted++;
                 }
-                else if (item.Cost <= item.Account.Balance)
+                else if (item.Cost <= (item.Account.Balance+item.Account.CalculateInterestEarnedInCurrentYear()))
                 {
                     countAfford++;
                 }
@@ -69,7 +69,7 @@ namespace ParentsBank.Controllers
                 {
                     countCompleted++;
                 }
-                else if (item.Cost <= item.Account.Balance)
+                else if (item.Cost <= (item.Account.Balance+item.Account.CalculateInterestEarnedInCurrentYear()))
                 {
                     countAfford++;
                 }
