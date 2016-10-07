@@ -69,7 +69,7 @@ namespace ParentsBank.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
         {
-            accountDetails.OpenDate = DateTime.Now;
+            accountDetails.OpenDate = DateTime.Today;
             accountDetails.Owner = User.Identity.Name;
             ValidateAccountDetails(accountDetails);
             if (ModelState.IsValid)

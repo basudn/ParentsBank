@@ -156,7 +156,7 @@ namespace ParentsBank.Controllers
             {
                 return HttpNotFound();
             }
-            wishlistItem.DateAdded = DateTime.Now;
+            wishlistItem.DateAdded = DateTime.Today;
             if (ModelState.IsValid)
             {
                 wishlistItem.Purchased = false;
