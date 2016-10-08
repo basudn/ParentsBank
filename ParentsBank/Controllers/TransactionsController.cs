@@ -22,7 +22,7 @@ namespace ParentsBank.Controllers
 
             string user = User.Identity.Name;
             List<Transaction> transactions = await db.Transactions.Include(t => t.Account).Where(t => t.Account.Owner.ToLower() == user.ToLower() || t.Account.Recipient.ToLower() == user.ToLower()).ToListAsync();
-            if(transactions.Count > 0 && transactions[0].Account.Owner == user)
+            if(transactions.Count > 0 && transactions[0].Account.Owner.ToLower() == user.ToLower())
             {
                 ViewBag.Role = "Owner";
             }
@@ -51,7 +51,7 @@ namespace ParentsBank.Controllers
                 transactions = transactions.Where(t => t.Account.Id == id);
             }
             List<Transaction> transactionList = await transactions.OrderByDescending(t => t.TransactionDate).ToListAsync();
-            if (transactionList.Count > 0 && transactionList[0].Account.Owner == user)
+            if (transactionList.Count > 0 && transactionList[0].Account.Owner.ToLower() == user.ToLower())
             {
                 ViewBag.Role = "Owner";
             }
@@ -70,6 +70,10 @@ namespace ParentsBank.Controllers
             if (transaction == null || (transaction.Account.Owner.ToLower() != user.ToLower() && transaction.Account.Recipient.ToLower() != user.ToLower()))
             {
                 return HttpNotFound();
+            }
+            if (transaction.Account.Owner.ToLower() == user.ToLower())
+            {
+                ViewBag.Role = "Owner";
             }
             return View(transaction);
         }

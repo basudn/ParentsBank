@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ParentsBank.Models.WishlistItem>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "View Wishlist Items";
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
@@ -13,7 +13,7 @@
     }
     <li class="active">Wishlist</li>
 </ol>
-<h2>Wishlist Items</h2>
+<h2>View Wishlist Items</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create") |
@@ -32,6 +32,7 @@
         <div class="progress-bar progress-bar-danger" role="progressbar" style="width:@remainingItems%" title="@(Model.Count() - ViewBag.CompletedItems - ViewBag.affordableItems) Remaining">
         </div>
     </div>
+    <hr />
     <table class="table">
         <tr>
             <th></th>
@@ -105,8 +106,11 @@
                 </td>
                 <td>
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    @Html.ActionLink("Details", "Details", new { id = item.Id })
+                    @if (ViewBag.Role == "Owner")
+                    {
+                        <span>|</span> @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    }
                 </td>
             </tr>
         }

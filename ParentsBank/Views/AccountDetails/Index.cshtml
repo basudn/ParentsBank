@@ -1,17 +1,18 @@
 ﻿@model IEnumerable<ParentsBank.Models.AccountDetails>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "View Accounts";
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
     <li class="active">Accounts</li>
 </ol>
-<h2>Index</h2>
+<h2>View Accounts</h2>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+<hr />
 @if (Model.Count() > 0)
 {
     <table class="table">
@@ -36,6 +37,9 @@
             </th>
             <th>
                 @Html.DisplayName("Interest Accrued")
+            </th>
+            <th>
+                @Html.DisplayName("Last Deposit Date")
             </th>
             <th></th>
         </tr>
@@ -65,8 +69,11 @@
                     @item.CalculateInterestEarnedInCurrentYear()
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @item.GetLastTransactionDate()
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span>|</span>
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) <span>|</span> 
                     @Html.ActionLink("Delete", "Delete", new { id = item.Id })
                 </td>
             </tr>

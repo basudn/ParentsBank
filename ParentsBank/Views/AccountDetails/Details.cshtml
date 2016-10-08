@@ -1,7 +1,7 @@
 ﻿@model ParentsBank.Models.AccountDetails
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "View Account";
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
@@ -11,10 +11,9 @@
     }
     <li class="active">@Model.Name's Account</li>
 </ol>
-<h2>Details</h2>
+<h2>View Account</h2>
 
 <div>
-    <h4>Account Details</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -66,11 +65,27 @@
         </dd>
         
         <dt>
-            @Html.DisplayName("Interest Calculated")
+            @Html.DisplayName("Interest Accrued")
         </dt>
 
         <dd>
             @Model.CalculateInterestEarnedInCurrentYear()
+        </dd>
+
+        <dt>
+            @Html.DisplayName("Total Balance")
+        </dt>
+
+        <dd>
+            @(Model.Balance+Model.CalculateInterestEarnedInCurrentYear())
+        </dd>
+
+        <dt>
+            @Html.DisplayName("Last Deposit Date")
+        </dt>
+
+        <dd>
+            @Model.GetLastTransactionDate()
         </dd>
 
     </dl>

@@ -1,7 +1,7 @@
 ﻿@model ParentsBank.Models.WishlistItem
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Edit Wishlist Item";
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
@@ -9,14 +9,13 @@
     <li>@Html.ActionLink(Model.Name, "Details", "WishlistItems", new { id = Model.Id }, new { })</li>
     <li class="active">Edit</li>
 </ol>
-<h2>Edit Wishlist</h2>
+<h2>Edit Wishlist Item</h2>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
     
     <div class="form-horizontal">
-        <h4>WishlistItem</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)

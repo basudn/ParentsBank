@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ParentsBank.Models.Transaction>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "View Transactions";
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
@@ -13,13 +13,14 @@
     }
     <li class="active">Transactions</li>
 </ol>
-<h2>Transactions</h2>
+<h2>View Transactions</h2>
 @if (ViewBag.Role == "Owner")
 {
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+    <p>
+        @Html.ActionLink("Create New", "Create")
+    </p>
 }
+<hr />
 @if (Model.Count() > 0)
 {
     <table class="table">
@@ -47,14 +48,14 @@
         {
             <tr>
                 <td>
-                @if (item.Amount > 0)
-                {
-                    <span class="badge" style="background-color: #5cb85c;">&nbsp;</span>
-                }
-                else
-                {
-                    <span class="badge" style="background-color: #d9534f;">&nbsp;</span>
-                }
+                    @if (item.Amount > 0)
+                    {
+                        <span class="badge" style="background-color: #5cb85c;">&nbsp;</span>
+                    }
+                    else
+                    {
+                        <span class="badge" style="background-color: #d9534f;">&nbsp;</span>
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Account.Owner)

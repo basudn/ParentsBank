@@ -1,17 +1,16 @@
 ﻿@model ParentsBank.Models.WishlistItem
 
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "View Wishlist Item";
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
     <li>@Html.ActionLink(Model.Account.Name + "'s Wishlist", "AccountWishlist", "WishlistItems", new { id = Model.Account.Id }, new { })</li>
     <li class="active">Details</li>
 </ol>
-<h2>Wishlist Item Details</h2>
+<h2>View Wishlist Item</h2>
 
 <div>
-    <h4>WishlistItem</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -76,6 +75,22 @@
 
         <dd>
             @Html.DisplayFor(model => model.Purchased)
+        </dd>
+
+        @if (Model.CalculateDifference() >= 0)
+        {
+            <dt>
+                @Html.DisplayName("Remaining Balance If Purchased")
+            </dt>
+        }
+        else
+        {
+            <dt>
+                @Html.DisplayName("Additional Balance Required")
+            </dt>
+        }
+        <dd>
+            @Math.Abs(Model.CalculateDifference())
         </dd>
 
     </dl>

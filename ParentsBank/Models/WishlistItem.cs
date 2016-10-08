@@ -30,5 +30,10 @@ namespace ParentsBank.Models
         [DataType(DataType.Url)]
         public string Link { get; set; }
         public bool Purchased { get; set; }
+
+        public double CalculateDifference()
+        {
+            return Account.Balance + Account.CalculateInterestEarnedInCurrentYear() - Cost;
+        }
     }
 }

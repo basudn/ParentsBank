@@ -39,6 +39,19 @@ namespace ParentsBank.Models
             Transactions = new List<Transaction>();
         }
 
+        public string GetLastTransactionDate()
+        {
+            ApplicationDbContext db = new ApplicationDbContext();
+            List<Transaction> transactions = db.Transactions.Where(t => t.Account.Id == Id && t.Amount >= 0).OrderByDescending(t => t.TransactionDate).ToList();
+            if(transactions.Count == 0)
+            {
+                return "";
+            } else
+            {
+                return transactions[0].TransactionDate.ToString("MM/dd/yyyy");
+            }
+        }
+
         public double CalculateInterestEarnedInCurrentYear()
         {
             ApplicationDbContext db = new ApplicationDbContext();
@@ -71,7 +84,6 @@ namespace ParentsBank.Models
             }
             while (it_date != today)
             {
-                //DateTime end = firstDay;
                 foreach (var it_trans in listTrans)
                 {
                     if (it_trans.TransactionDate.Equals(it_date))

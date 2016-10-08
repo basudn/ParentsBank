@@ -10,7 +10,7 @@ using System.Web.Mvc;
 using ParentsBank.Models;
 
 namespace ParentsBank.Controllers
-{   
+{
     [Authorize]
     public class WishlistItemsController : Controller
     {
@@ -30,29 +30,33 @@ namespace ParentsBank.Controllers
                 {
                     countCompleted++;
                 }
-                else if (item.Cost <= (item.Account.Balance+item.Account.CalculateInterestEarnedInCurrentYear()))
+                else if (item.Cost <= (item.Account.Balance + item.Account.CalculateInterestEarnedInCurrentYear()))
                 {
                     countAfford++;
                 }
             }
             ViewBag.CompletedItems = countCompleted;
             ViewBag.AffordableItems = countAfford;
+            if (wishlistItems.Count > 0 && wishlistItems[0].Account.Owner.ToLower() == user.ToLower())
+            {
+                ViewBag.Role = "Owner";
+            }
             return View("Index", wishlistItems);
         }
 
         // GET: WishlistItems
         public async Task<ActionResult> AccountWishlist(int? id)
-        { 
+        {
             string user = User.Identity.Name;
             var wishlistQuery = db.WishlistItems.Include(w => w.Account).Where(w => w.Account.Owner.ToLower() == user.ToLower() || w.Account.Recipient.ToLower() == user.ToLower());
-            if(id == null)
+            if (id == null)
             {
                 return HttpNotFound();
             }
             else
             {
                 AccountDetails account = await db.Accounts.FindAsync(id);
-                if(account == null || (account.Owner.ToLower() != user.ToLower() && account.Recipient.ToLower() != user.ToLower()))
+                if (account == null || (account.Owner.ToLower() != user.ToLower() && account.Recipient.ToLower() != user.ToLower()))
                 {
                     return HttpNotFound();
                 }
@@ -69,17 +73,21 @@ namespace ParentsBank.Controllers
                 {
                     countCompleted++;
                 }
-                else if (item.Cost <= (item.Account.Balance+item.Account.CalculateInterestEarnedInCurrentYear()))
+                else if (item.Cost <= (item.Account.Balance + item.Account.CalculateInterestEarnedInCurrentYear()))
                 {
                     countAfford++;
                 }
             }
             ViewBag.CompletedItems = countCompleted;
-            ViewBag.AffordableItems = countAfford; 
+            ViewBag.AffordableItems = countAfford;
+            if (wishlistItems.Count > 0 && wishlistItems[0].Account.Owner.ToLower() == user.ToLower())
+            {
+                ViewBag.Role = "Owner";
+            }
             return View("Index", wishlistItems);
         }
 
-        public async Task<ActionResult> Search (string itemName, string itemMinPrice, string itemMaxPrice, string itemDescription)
+        public async Task<ActionResult> Search(string itemName, string itemMinPrice, string itemMaxPrice, string itemDescription)
         {
             string user = User.Identity.Name;
             bool searchCompleted = false;
@@ -91,13 +99,29 @@ namespace ParentsBank.Controllers
             }
             if (!string.IsNullOrWhiteSpace(itemMinPrice))
             {
-                wishlistQuery = wishlistQuery.Where(w => w.Cost >= int.Parse(itemMinPrice));
-                searchCompleted = true;
+                try
+                {
+                    double min = double.Parse(itemMinPrice);
+                    wishlistQuery = wishlistQuery.Where(w => w.Cost >= min);
+                    searchCompleted = true;
+                }
+                catch (Exception e)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, e.Message);
+                }
             }
             if (!string.IsNullOrWhiteSpace(itemMaxPrice))
             {
-                wishlistQuery = wishlistQuery.Where(w => w.Cost <= int.Parse(itemMaxPrice));
-                searchCompleted = true;
+                try
+                {
+                    double max = double.Parse(itemMaxPrice);
+                    wishlistQuery = wishlistQuery.Where(w => w.Cost <= max);
+                    searchCompleted = true;
+                }
+                catch (Exception e)
+                {
+                    return new HttpStatusCodeResult(HttpStatusCode.BadRequest, e.Message);
+                }
             }
             if (!string.IsNullOrWhiteSpace(itemDescription))
             {
@@ -223,7 +247,7 @@ namespace ParentsBank.Controllers
             }
             WishlistItem wishlistItem = await db.WishlistItems.FindAsync(id);
             string user = User.Identity.Name;
-            if (wishlistItem == null || (wishlistItem.Account.Owner.ToLower() != user.ToLower() && wishlistItem.Account.Recipient.ToLower() != user.ToLower()))
+            if (wishlistItem == null || wishlistItem.Account.Owner.ToLower() != user.ToLower())
             {
                 return HttpNotFound();
             }
@@ -237,20 +261,13 @@ namespace ParentsBank.Controllers
         {
             WishlistItem wishlistItem = await db.WishlistItems.FindAsync(id);
             string user = User.Identity.Name;
-            if (wishlistItem.Account.Owner.ToLower() != user.ToLower() && wishlistItem.Account.Recipient.ToLower() != user.ToLower())
+            if (wishlistItem == null || wishlistItem.Account.Owner.ToLower() != user.ToLower())
             {
                 return HttpNotFound();
             }
-            if (wishlistItem.Account.Recipient.ToLower() == user.ToLower())
-            {
-                ModelState.AddModelError("Purchased", "Recipient cannot delete a wishlist item.");
-                return View(wishlistItem);
-            }
-            else {
-                db.WishlistItems.Remove(wishlistItem);
-                await db.SaveChangesAsync();
-                return RedirectToAction("Index");
-            }
+            db.WishlistItems.Remove(wishlistItem);
+            await db.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)

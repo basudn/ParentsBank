@@ -1,7 +1,7 @@
 ﻿@model ParentsBank.Models.AccountDetails
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Edit Account";
 }
 <ol class="breadcrumb">
     <li>@Html.ActionLink("Home", "Index", "Home")</li>
@@ -12,14 +12,13 @@
     <li>@Html.ActionLink(@Model.Name+"'s Account", "Details", "AccountDetails", new { id = Model.Id }, new { })</li>
     <li class="active">Edit</li>
 </ol>
-<h2>Edit</h2>
+<h2>Edit Account</h2>
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <h4>AccountDetails</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
