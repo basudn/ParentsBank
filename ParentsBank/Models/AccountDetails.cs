@@ -65,7 +65,7 @@ namespace ParentsBank.Models
             var it_date2 = firstDay;
             DateTime previous = firstDay;
             List<Transaction> listTrans = db.Transactions.Where(t => t.Account.Id == Id && t.TransactionDate >= firstDay).ToList();
-            while (it_date2 != today)
+            while (it_date2 <= today)
             {
                 foreach (var it_trans in listTrans)
                 {
@@ -82,7 +82,7 @@ namespace ParentsBank.Models
                 var beginningbalance = Balance - yearlyAmount;
                 runningTotal = beginningbalance;
             }
-            while (it_date != today)
+            while (it_date <= today)
             {
                 foreach (var it_trans in listTrans)
                 {

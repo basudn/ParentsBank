@@ -89,7 +89,7 @@ namespace ParentsBank.Controllers
             }
             else
             {
-                if(list[0].Owner != user)
+                if(list[0].Owner.ToLower() != user.ToLower())
                 {
                     return HttpNotFound();
                 }

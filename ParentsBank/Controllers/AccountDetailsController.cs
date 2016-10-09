@@ -54,7 +54,7 @@ namespace ParentsBank.Controllers
         // GET: AccountDetails/Create
         public ActionResult Create()
         {
-            List<AccountDetails> accounts = db.Accounts.Where(acct => acct.Recipient == User.Identity.Name).ToList();
+            List<AccountDetails> accounts = db.Accounts.Where(acct => acct.Recipient.ToLower() == User.Identity.Name.ToLower()).ToList();
             if (accounts.Count > 0)
             {
                 return RedirectToAction("Details", new { id = accounts[0].Id });
@@ -70,7 +70,7 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> Create([Bind(Include = "Id,Owner,Recipient,Name,OpenDate,InterestRate,Balance")] AccountDetails accountDetails)
         {
             accountDetails.OpenDate = DateTime.Today;
-            accountDetails.Owner = User.Identity.Name;
+            accountDetails.Owner = User.Identity.Name.ToLower();
             ValidateAccountDetails(accountDetails);
             if (ModelState.IsValid)
             {
@@ -111,9 +111,9 @@ namespace ParentsBank.Controllers
         {
             AccountDetails storedDetails = db.Accounts.Where(acct => acct.Id == accountDetails.Id).ToList()[0];
             storedDetails.Name = accountDetails.Name;
-            if (storedDetails.Owner == User.Identity.Name)
+            if (storedDetails.Owner.ToLower() == User.Identity.Name.ToLower())
             {
-                storedDetails.Recipient = accountDetails.Recipient;
+                storedDetails.Recipient = accountDetails.Recipient.ToLower();
                 storedDetails.InterestRate = accountDetails.InterestRate;
             }
             ValidateAccountDetails(storedDetails);
@@ -150,7 +150,7 @@ namespace ParentsBank.Controllers
         public async Task<ActionResult> DeleteConfirmed(int id)
         {
             AccountDetails accountDetails = await db.Accounts.FindAsync(id);
-            if (accountDetails.Owner != User.Identity.Name)
+            if (accountDetails.Owner.ToLower() != User.Identity.Name.ToLower())
             {
                 return HttpNotFound();
             }
