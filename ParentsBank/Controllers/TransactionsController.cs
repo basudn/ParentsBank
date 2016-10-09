@@ -22,7 +22,13 @@ namespace ParentsBank.Controllers
 
             string user = User.Identity.Name;
             List<Transaction> transactions = await db.Transactions.Include(t => t.Account).Where(t => t.Account.Owner.ToLower() == user.ToLower() || t.Account.Recipient.ToLower() == user.ToLower()).ToListAsync();
-            if(transactions.Count > 0 && transactions[0].Account.Owner.ToLower() == user.ToLower())
+            if (transactions.Count == 0) {
+                if(db.Accounts.Where(a => a.Owner.ToLower() == user.ToLower()).ToList().Count > 0)
+                {
+                    ViewBag.Role = "Owner";
+                }
+            }
+            else if(transactions[0].Account.Owner.ToLower() == user.ToLower())
             {
                 ViewBag.Role = "Owner";
             }
@@ -51,7 +57,14 @@ namespace ParentsBank.Controllers
                 transactions = transactions.Where(t => t.Account.Id == id);
             }
             List<Transaction> transactionList = await transactions.OrderByDescending(t => t.TransactionDate).ToListAsync();
-            if (transactionList.Count > 0 && transactionList[0].Account.Owner.ToLower() == user.ToLower())
+            if (transactionList.Count == 0)
+            {
+                if (db.Accounts.Where(a => a.Owner.ToLower() == user.ToLower()).ToList().Count > 0)
+                {
+                    ViewBag.Role = "Owner";
+                }
+            }
+            else if (transactionList[0].Account.Owner.ToLower() == user.ToLower())
             {
                 ViewBag.Role = "Owner";
             }
