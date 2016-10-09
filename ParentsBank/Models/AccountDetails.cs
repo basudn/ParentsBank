@@ -61,38 +61,37 @@ namespace ParentsBank.Models
             double runningTotal = 0.00000;
             double yearlyAmount = 0.0;
             var today = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            var it_date = firstDay;
-            var it_date2 = firstDay;
+            var date1 = firstDay;
+            var date2 = firstDay;
             DateTime previous = firstDay;
             List<Transaction> listTrans = db.Transactions.Where(t => t.Account.Id == Id && t.TransactionDate >= firstDay).ToList();
-            while (it_date2 <= today)
+            while (date2 <= today)
             {
                 foreach (var it_trans in listTrans)
                 {
-                    if (it_trans.TransactionDate.Equals(it_date2))
+                    if (it_trans.TransactionDate.Equals(date2))
                     {
                         yearlyAmount += it_trans.Amount;
                     }
                 }
-                it_date2 = it_date2.AddDays(1);
+                date2 = date2.AddDays(1);
             }
 
             if (Balance > yearlyAmount)
             {
-                var beginningbalance = Balance - yearlyAmount;
-                runningTotal = beginningbalance;
+                runningTotal = Balance - yearlyAmount;
             }
-            while (it_date <= today)
+            while (date1 <= today)
             {
                 foreach (var it_trans in listTrans)
                 {
-                    if (it_trans.TransactionDate.Equals(it_date))
+                    if (it_trans.TransactionDate.Equals(date1))
                     {
                         runningTotal += it_trans.Amount;
                     }
                 }
                 runningTotal = runningTotal * Math.Pow(1.0 + (InterestRate / (100 * 12)), (12.0 * 1 / yearlyDaysInt));
-                it_date = it_date.AddDays(1);
+                date1 = date1.AddDays(1);
             }
             return Math.Round(runningTotal - yearlyAmount, 2);
         }
